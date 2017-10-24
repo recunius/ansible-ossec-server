@@ -14,6 +14,10 @@
     {% endif %}
   </global>
 
+  <client>
+    <server-hostname>{{ ansible_hostname }}</server-hostname>
+  </client>
+
 {% if ossec_server_config.extra_emails is defined %}
 {% for mail in ossec_server_config.extra_emails %}
   <email_alerts>
