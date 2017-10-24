@@ -72,19 +72,14 @@
   register: csyslog_running
   changed_when: False
 
-- name: Enable client-syslog if not running and ossec_server_config.syslog_outputs is given
-  command: /var/ossec/bin/ossec-control enable client-syslog
-  when: csyslog_running.stdout == '0' and ossec_server_config.syslog_outputs is defined
-
-- name: Start client-syslog if not running and ossec_server_config.syslog_outputs is given
-  command: /var/ossec/bin/ossec-control start client-syslog
-  when: csyslog_running.stdout == '0' and ossec_server_config.syslog_outputs is defined
-
 - name: Set ossec deploy facts for Debian
   set_fact:
     ossec_server_config_filename: ossec.conf
     ossec_init_name: ossec
   when: ansible_os_family == "Debian"
+
+- name: ossec_server_config_filename
+  debug: msg="ossec_server_config_filename = {{ ossec_server_config_filename }}"
 
 - name: Configure the ossec-server
   template: src=var-ossec-etc-ossec-server.conf.j2
@@ -96,6 +91,14 @@
   tags:
     - init
     - config
+
+- name: Enable client-syslog if not running and ossec_server_config.syslog_outputs is given
+  command: /var/ossec/bin/ossec-control enable client-syslog
+  when: csyslog_running.stdout == '0' and ossec_server_config.syslog_outputs is defined
+
+- name: Start client-syslog if not running and ossec_server_config.syslog_outputs is given
+  command: /var/ossec/bin/ossec-control start client-syslog
+  when: csyslog_running.stdout == '0' and ossec_server_config.syslog_outputs is defined
 
 - name: Write ossec-authd init file
   template: src=ossec-authd-init.service
